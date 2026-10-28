@@ -64,6 +64,13 @@ It exists because COSMIC doesn't support the usual night light tools
    cd cosmic-nightlight/arch
    makepkg -si
    ```
+
+   On NixOS, clone the repository and add this to `environment.systemPackages`
+   in your `configuration.nix`, then run `sudo nixos-rebuild switch`:
+
+   ```nix
+   (pkgs.callPackage /path/to/cosmic-nightlight/nix/package.nix { })
+   ```
 3. Add the applet: **COSMIC Settings → Desktop → Panel** (or **Dock**)
    **→ Configure applets → Add applet → Night Light**.
 

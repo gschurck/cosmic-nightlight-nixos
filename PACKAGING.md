@@ -2,8 +2,8 @@
 # Packaging cosmic-nightlight
 
 This covers the `.deb`, which most of this file is about, the `.rpm` for
-Fedora (see [RPM (Fedora)](#rpm-fedora)) and the Arch Linux package (see
-[Arch Linux](#arch-linux)).
+Fedora (see [RPM (Fedora)](#rpm-fedora)), the Arch Linux package (see
+[Arch Linux](#arch-linux)) and the NixOS package (see [NixOS](#nixos)).
 
 This tool needs root (DRM master + VT switching), so its natural distribution
 channel is a **native `.deb`**. A `.deb` shows up in the COSMIC Store as the
@@ -134,6 +134,23 @@ package, which would want a real checksum there.
 
 The PKGBUILD's `pkgver=` is one of the places the version is written, so bump it
 with the others; `scripts/check-version.sh` checks it.
+
+## NixOS
+
+[`nix/package.nix`](nix/package.nix) builds the same set of files as the
+PKGBUILD, from the checkout it sits in. NixOS has no `/usr/bin`, so `postPatch`
+points the helper path in `backend.rs` and the polkit rule at the store path.
+pkexec matches the helper's real path, so the rule only works if it names that
+store path. Putting the package in `environment.systemPackages` is all the
+setup it needs: NixOS links every package's `share/polkit-1` into the directory
+polkitd reads rules from.
+
+The version is read from `Cargo.toml`, so there is nothing to bump. There is no
+CI job for it; build it locally with:
+
+```sh
+nix-build -E 'with import <nixpkgs> { }; callPackage ./nix/package.nix { }'
+```
 
 ## Getting it into the COSMIC Store
 
